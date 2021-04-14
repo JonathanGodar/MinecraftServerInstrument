@@ -54,6 +54,11 @@ export class OrcestratorService {
   }
 
   notifyBooted() {
+    this.httpService
+      .get(`http://google.com:${this.configService.get('TRIGGER_PORT')}`)
+      .toPromise()
+      .catch();
+
     return this.httpService
       .post(`${this.serverURL}server/bootComplete/${this.currentId}`)
       .toPromise();

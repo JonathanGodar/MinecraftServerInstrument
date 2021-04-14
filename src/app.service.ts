@@ -11,8 +11,6 @@ import { OrcestratorService } from './orcestrator/orcestrator.service';
 export class AppService {
   mcProcess?: proc.ChildProcessWithoutNullStreams;
 
-  booting = false;
-
   constructor(
     private readonly configService: ConfigService,
     private readonly orcestrator: OrcestratorService,
@@ -32,6 +30,7 @@ export class AppService {
 
       Promise.all(allPromises).then(() => {
         if (exit) process.exit();
+        console.log('Program exiting!');
       });
     };
 
@@ -71,7 +70,6 @@ export class AppService {
     spawned.stdout.on('data', (data: Buffer) => {
       console.log(data.toString());
       if (data.toString().search(/Done \(/g) != -1) {
-        this.booting = false;
         this.orcestrator.notifyBooted();
       }
 
@@ -95,17 +93,15 @@ export class AppService {
     });
   }
 
+  stopping = false;
   async stop() {
-    if (!this.mcProcess) {
+    if (!this.mcProcess && !this.stopping) {
       return;
     }
+    this.stopping = true;
 
     const a = new Observable((obs) => {
-      console.log('obs created!');
-
       this.mcProcess.once('exit', () => {
-        console.log('obs fired!');
-
         obs.next({ code: 0 });
         obs.complete();
       });
@@ -114,6 +110,6 @@ export class AppService {
     this.mcProcess.stdin.write('stop\n');
 
     await a.toPromise();
-    console.log('server exitecd sucessfully!');
+    this.stopping = false;
   }
 }
