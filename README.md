@@ -32,6 +32,24 @@
 $ npm install
 ```
 
+## Configuration
+### .env
+
+## Configuration
+
+### .env
+
+SERVER_DIR: Directory of the minecraft server.
+SERVER_FILE: Name of the minecraft server file
+SERVER_ARGS: Arguments that will be passed when starting the minecraft server
+ORCESTRATOR_URL: The orchestrators url
+NAME: Name of this instrument
+BASE_URI: The uri to access this webserver
+
+TRIGGER_PORT: The trigger port used to make the portforwarding go to this computer
+
+ACCESS_TOKEN: An access token ( the orchestrators secret )
+
 ## Running the app
 
 ```bash
