@@ -18,8 +18,9 @@ export class AppService {
 
   async onModuleInit() {
     await this.orcestrator.sendServerInformation();
-    await this.orcestrator.notifyAvailable();
+    await this.orcestrator.updateCurrentId();
 
+    await this.orcestrator.notifyAvailable();
     const handleExit = async (exit: boolean) => {
       const allPromises = [this.orcestrator.notifyNotAvailable()];
 

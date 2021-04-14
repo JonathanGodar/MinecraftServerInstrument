@@ -1,6 +1,7 @@
 import { HttpService, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CLIENT_RENEG_WINDOW } from 'node:tls';
+import { Subject } from 'rxjs';
 
 @Injectable()
 export class OrcestratorService {
@@ -14,23 +15,66 @@ export class OrcestratorService {
   }
 
   async sendServerInformation() {
+    const body = {
+      name: this.configService.get('NAME'),
+      baseUri: this.configService.get('BASE_URI'),
+    };
+
     try {
       await this.httpService
-        .post(this.serverURL + 'server', {
-          name: this.configService.get('NAME'),
-          baseUri: this.configService.get('BASE_URI'),
-        })
-        .toPromise()
-        .catch();
-    } catch (e) {}
+        .post(this.serverURL + 'server', body, { timeout: 1000 })
+        .toPromise();
+      console.log('Connected!');
+    } catch (e: unknown) {
+      console.log('Could not connect, trying again');
 
+      const waitTillConnected = new Subject();
+
+      setTimeout(async () => {
+        await this.sendServerInformation();
+        waitTillConnected.complete();
+      }, 10000);
+
+      await waitTillConnected.toPromise();
+      return;
+    }
+
+    // try {
+    //   await this.httpService
+    //     .post(this.serverURL + 'server', {
+    //       name: this.configService.get('NAME'),
+    //       baseUri: this.configService.get('BASE_URI'),
+    //     })
+    //     .toPromise()
+    //     .catch();
+    //   const response = await this.httpService
+    //     .get(
+    //       this.serverURL + 'server' + `?name=${this.configService.get('NAME')}`,
+    //     )
+    //     .toPromise();
+
+    //   console.log(response.data);
+    //   this.currentId = response.data[0].id;
+    // } catch (e) {
+    //   const waitTillDone = new Subject();
+
+    //   setTimeout(async () => {
+    //     console.log('Could not connect trying again!');
+    //     await this.sendServerInformation();
+    //     waitTillDone.complete();
+    //   }, 5000);
+
+    //   await waitTillDone.toPromise();
+    // }
+  }
+
+  async updateCurrentId() {
     const response = await this.httpService
       .get(
         this.serverURL + 'server' + `?name=${this.configService.get('NAME')}`,
       )
       .toPromise();
 
-    console.log(response.data);
     this.currentId = response.data[0].id;
   }
 
