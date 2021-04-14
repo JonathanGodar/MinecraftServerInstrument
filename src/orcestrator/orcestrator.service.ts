@@ -38,34 +38,6 @@ export class OrcestratorService {
       await waitTillConnected.toPromise();
       return;
     }
-
-    // try {
-    //   await this.httpService
-    //     .post(this.serverURL + 'server', {
-    //       name: this.configService.get('NAME'),
-    //       baseUri: this.configService.get('BASE_URI'),
-    //     })
-    //     .toPromise()
-    //     .catch();
-    //   const response = await this.httpService
-    //     .get(
-    //       this.serverURL + 'server' + `?name=${this.configService.get('NAME')}`,
-    //     )
-    //     .toPromise();
-
-    //   console.log(response.data);
-    //   this.currentId = response.data[0].id;
-    // } catch (e) {
-    //   const waitTillDone = new Subject();
-
-    //   setTimeout(async () => {
-    //     console.log('Could not connect trying again!');
-    //     await this.sendServerInformation();
-    //     waitTillDone.complete();
-    //   }, 5000);
-
-    //   await waitTillDone.toPromise();
-    // }
   }
 
   async updateCurrentId() {
